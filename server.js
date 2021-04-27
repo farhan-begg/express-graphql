@@ -6,6 +6,16 @@ const { buildSchema } = require('graphql')
 // Create a schema
 const schema = buildSchema(`
 
+
+
+type Mutation {
+    addPet(name: String!, species: String!): Pet!
+    updatePet(id: Int!, name: String, species: String): Pet
+    deletePet(id: Int!, name: String, species: String): Pet
+}
+
+
+
 enum Species {
     Dog 
     Cat
@@ -27,8 +37,6 @@ type Dice {
     sides: Int!
     rolls: [Int]
 }
-
-
 
 type Query {
     allPets: [Pet!]! # returns a collection of Pet
@@ -61,6 +69,28 @@ const root = {
     },
     firstPet: () => {
         return petList[0]
+    },
+
+    addPet: ({ name, species }) => {
+        const pet = { name, species }
+        petList.push(pet)
+        return pet
+    },
+    updatePet: ({ id, name, species }) => {
+        const pet = petList[id]  // is there anything at this id? 
+        if (pet === undefined) { // Id not return null
+            return null 
+        }
+    
+    // if name or species was not included use the original
+        pet.name = name || pet.name 
+        pet.species = species || pet.species
+        return pet
+    },
+
+    deletePet: ({id, name, species }) => {
+        const pet = petList[id]
+        return pet.findByIdandDelete(id)
     },
 
     getTime: () => {
